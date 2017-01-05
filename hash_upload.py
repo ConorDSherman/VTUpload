@@ -20,13 +20,6 @@ API_KEY = API_FILE.read().rstrip('\n')
 #Temporary Dictionary
 hash_report = {}
 
-#Final Excel Output
-output_workbook = xlsxwriter.Workbook('/Users/conorsherman/Desktop/Tanium_Hash_Output.xlsx')
-output_worksheet = output_workbook.add_worksheet()
-output_row = 0
-output_col = 0
-
-
 #Open and assign the Excel
 wb = openpyxl.load_workbook('/Users/conorsherman/Desktop/Tanium_Hash_One_Column.xlsx')
 sheet = wb.get_sheet_by_name("Sheet1")
@@ -51,23 +44,31 @@ for hash in range(0, 7):
     hash_report.update({json_response.get('resource'): json_response.get('positives')})
     print hash_report
 
-    #Write to Excel
-    for key in hash_report.keys():
-        print hash_report.keys()
-        output_row += 1
-        print output_row
-        output_col = 0
-        print output_col
-        output_worksheet.write(output_row, output_col, key)
-        for item in hash_report[key]:
-            print key
-            print item
-         #   output_worksheet.write(output_row, output_col + 1, item)
-          #  output_row += 1
-
 
     #Time Delay for Rate Limit
     time.sleep(20)
 
+# Write to Excel
+    output_workbook = xlsxwriter.Workbook('/Users/conorsherman/Desktop/Tanium_Hash_Output.xlsx')
+    output_worksheet = output_workbook.add_worksheet()
+    output_row = 0
+    output_col = 0
+
+    for key in hash_report:
+        print key
+        print value
+    '''for key in  hash_report.keys():
+        output_row += 1
+        output_col = 0
+
+        print key
+        print hash_report.get(key)
+
+        output_worksheet.write(output_row, output_col, key)
+        for item in hash_report.get(key):
+            print key
+            print item
+         #   output_worksheet.write(output_row, output_col + 1, item)
+          #  output_row += 1'''
 #Cleanup
 output_workbook.close()
