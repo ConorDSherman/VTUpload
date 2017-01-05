@@ -1,9 +1,20 @@
+'''CODE OUTLINE
+1. Open the CSV
+2. Extract the HASH into an Array (?)
+Loop
+3. Check the HASH with VT
+4. Store the Respone 'HASH : Verdict"
+5. Add the HASH to a 'Checked List'
+6. Close loop and print report'''
+
 import requests
-params = {'apikey': '0e800cf660c8cb0108547968241e6bf3108119b45997a67273619a916dcf021a', 'resource': 'b81f64818bb0711e17a630aacd99c5a8'}
+
+
+params = {'apikey': '-YOUR API KEY HERE-', 'resource': '7657fcb7d772448a6d8504e4b20168b8'}
 headers = {
   "Accept-Encoding": "gzip, deflate",
-  "User-Agent" : "gzip,  ConorSherman"
+  "User-Agent" : "gzip,  My Python requests library example client or username"
   }
-response = requests.post('https://www.virustotal.com/vtapi/v2/file/rescan',
- params=params)
+response = requests.get('https://www.virustotal.com/vtapi/v2/file/report',
+  params=params, headers=headers)
 json_response = response.json()
