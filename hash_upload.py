@@ -1,44 +1,28 @@
-'''CODE OUTLINE
-1. Open the CSV
-2. Extract the HASH into an Array (?)
-Loop
-3. Check the HASH with VT
-4. Store the Respone 'HASH : Verdict"
-5. Add the HASH to a 'Checked List'
-6. Close loop and print report
-    http://stackoverflow.com/questions/23113231/write-dictionary-values-in-an-excel-file'''
-
 # Import Libraries
 import requests #Needed For the GET request
 import openpyxl #Needed to Open the Excel files
-import time #Needed for the sleep time as to not violate the VT T&C
+import time #Needed for the sleep time as to not violate the VirusTotal T&C
 import xlsxwriter #Needed to write to Excel
 
 #Open Remotely Stored API Key
 API_FILE = open('/Users/conorsherman/Desktop/VT_API_KEY.txt', 'r') #This is Unique to You
 API_KEY = API_FILE.read().rstrip('\n') #Because, you know... text is "simple"
-#
-#Open and assign the Excel
-input_workbook = openpyxl.load_workbook('/Users/conorsherman/Desktop/Tanium_Hash_One_Column.xlsx')
-input_sheet = input_workbook.get_sheet_by_name("Sheet1")
 
-# Prepare Export
-# Open the Files to Write To Excel
-output_workbook = xlsxwriter.Workbook('/Users/conorsherman/Desktop/Tanium_Hash_Output.xlsx')
-output_worksheet = output_workbook.add_worksheet()
-output_row = 0
-output_col = 0
+#Open and assign the Excel
+input_workbook = openpyxl.load_workbook('/Users/conorsherman/Desktop/Tanium_Process_Hash.xlsx')
+input_sheet = input_workbook.worksheets[0]
 
 #Initialize counter user to select value out of the input Excel
-input_row = 1
+input_row = 2
 
 # Temp Dictionary to hold the results
 hash_report = {}
 
-for hash in range(0, 60): #CHANGE ME TO THE MAX
+for hash in range(1, input_sheet.max_row): #Needs to Start at 1 due to the headers
 
     #Get Value of the Cell
-    hash_value=input_sheet.cell(row=input_row, column=1).value
+    hash_value=input_sheet.cell(row=input_row, column=2).value
+    print hash_value
 
     #Send Hash to VT
     params = {'apikey': API_KEY, 'resource': hash_value}
@@ -47,7 +31,6 @@ for hash in range(0, 60): #CHANGE ME TO THE MAX
     json_response = response.json()
 
     #Update the Report
-    #I had to cast to STR so that i could loop through the dictionary during the write to Excel function
     if json_response.get('positives') == None:
         hash_report.update({json_response.get('resource'): "No Results"})
     else:
@@ -61,10 +44,21 @@ for hash in range(0, 60): #CHANGE ME TO THE MAX
     #Time Delay for Rate Limit
     time.sleep(15)
 
+
+# Prepare Export
+# Open the Files to Write To Excel
+output_workbook = xlsxwriter.Workbook('/Users/conorsherman/Desktop/Tanium_Hash_Output.xlsx')
+output_worksheet = output_workbook.add_worksheet()
+output_row = 0
+output_col = 0
+
+#Write Headers
+output_worksheet.write(output_row, output_col, "Process HASH")
+output_worksheet.write(output_row, output_col + 1, "VirusTotal Results")
+output_row +=1 #Move to the next row
+
 #Grab the results from the Dictionary
 for key, value in hash_report.items():
-    #print hash_report.items()
-    #print hash_report
     output_worksheet.write(output_row, output_col, key) #Write the Hash
     output_worksheet.write(output_row, output_col + 1, hash_report[key]) #Write the Result
     #Position for next Output
