@@ -17,7 +17,7 @@ import xlsxwriter #Needed to write to Excel
 #Open Remotely Stored API Key
 API_FILE = open('/Users/conorsherman/Desktop/VT_API_KEY.txt', 'r') #This is Unique to You
 API_KEY = API_FILE.read().rstrip('\n') #Because, you know... text is "simple"
-
+#
 #Open and assign the Excel
 input_workbook = openpyxl.load_workbook('/Users/conorsherman/Desktop/Tanium_Hash_One_Column.xlsx')
 input_sheet = input_workbook.get_sheet_by_name("Sheet1")
