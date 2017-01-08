@@ -24,7 +24,6 @@ for row in reader:
     tanium_new_sheet.append(row)
 tanium_new_workbook.save(TANIUM_TEMP_XLSX)
 
-
 #Open and assign the Excel
 input_workbook = openpyxl.load_workbook(TANIUM_TEMP_XLSX)
 input_sheet = input_workbook.worksheets[0]
@@ -44,24 +43,27 @@ for hash in range(1, input_sheet.max_row): #Needs to Start at 1 due to the heade
 
     #Get Value of the Cell
     hash_value=input_sheet.cell(row=input_row, column=2).value
+    if hash_value:
 
-    #Send Hash to VT
-    params = {'apikey': API_KEY, 'resource': hash_value}
-    headers = {"Accept-Encoding": "gzip, deflate", "User-Agent": "gzip,  ConorSherman"}
-    response = requests.get('https://www.virustotal.com/vtapi/v2/file/report', params=params, headers=headers)
-    json_response = response.json()
+        #Send Hash to VT
+        params = {'apikey': API_KEY, 'resource': hash_value}
+        headers = {"Accept-Encoding": "gzip, deflate", "User-Agent": "gzip,  ConorSherman"}
+        response = requests.get('https://www.virustotal.com/vtapi/v2/file/report', params=params, headers=headers)
+        json_response = response.json()
 
-    #Update the Report
-    if json_response.get('positives') == None:
-        hash_report.update({json_response.get('resource'): "No Results"})
+        #Update the Report
+        if json_response.get('positives') == None:
+            hash_report.update({json_response.get('resource'): "No Results"})
+        else:
+            hash_report.update({json_response.get('resource'): json_response.get('positives')})
     else:
-        hash_report.update({json_response.get('resource'): json_response.get('positives')})
+        print "Missing a HASH on row %s" %input_row
 
     # Move to the next HASH
     input_row += 1
 
     #Time Delay for Rate Limit
-    print "Wait for it..." + "\n"
+    print "Wait for it...on row %s" %input_row + "\n"
     time.sleep(15)
 
 
