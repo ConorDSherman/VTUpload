@@ -7,9 +7,10 @@ import csv #Needed to manipulate the raw data
 
 #Directores for Needed Files
 API_KEY_LOCATION = '/Users/conorsherman/Desktop/VT_API_KEY.txt'
-TANIUM_RAW_CSV = '/Users/conorsherman/Desktop/tanium.csv'
+TANIUM_RAW_CSV = '/Users/conorsherman/Desktop/Tanium.csv'
 TANIUM_TEMP_XLSX = '/Users/conorsherman/Desktop/TEMP_Tanium_Process_Hash.xlsx'
 TANIUM_FINAL_XSLX = '/Users/conorsherman/Desktop/Tanium_Output.xlsx'
+HASH_CHECKED_FILE = '/Users/conorsherman/Desktop/Tanium_HASH_Checked.xlsx'
 
 #Open Remotely Stored API Key
 API_FILE = open(API_KEY_LOCATION, 'r') #This is Unique to You
@@ -24,6 +25,15 @@ for row in reader:
     tanium_new_sheet.append(row)
 tanium_new_workbook.save(TANIUM_TEMP_XLSX)
 
+#Open the Excel with List of HASH Previously Checked
+hash_checked_workbook = openpyxl.load_workbook(HASH_CHECKED_FILE)
+hash_checked_sheet = hash_checked_workbook.worksheets[0]
+
+#Populate the List with items from the HASH Checked Excel
+hash_list = []
+for row in range(2, hash_checked_sheet.max_row):
+    hash_list.append(hash_checked_sheet.cell(row=row, column=2).value)
+
 #Open and assign the Excel
 input_workbook = openpyxl.load_workbook(TANIUM_TEMP_XLSX)
 input_sheet = input_workbook.worksheets[0]
@@ -37,34 +47,40 @@ hash_report = {}
 # Temo Dictionary to hold the process name
 hash_process_name = {}
 
-for hash in range(1, input_sheet.max_row): #Needs to Start at 1 due to the headers
+for hash in range(1, 25): #Needs to Start at 1 due to the headers
     #Populating the HASH and process name
     hash_process_name.update({input_sheet.cell(row=input_row, column=2).value : input_sheet.cell(row=input_row, column=1).value})
 
     #Get Value of the Cell
     hash_value=input_sheet.cell(row=input_row, column=2).value
+    #CHECK There is a HASH Value
     if hash_value:
+        #CHECK the HASH is not on the "Checked List"
+        if hash_value not in hash_list:
+            #Send Hash to VT
+            params = {'apikey': API_KEY, 'resource': hash_value}
+            headers = {"Accept-Encoding": "gzip, deflate", "User-Agent": "gzip,  ConorSherman"}
+            response = requests.get('https://www.virustotal.com/vtapi/v2/file/report', params=params, headers=headers)
+            json_response = response.json()
 
-        #Send Hash to VT
-        params = {'apikey': API_KEY, 'resource': hash_value}
-        headers = {"Accept-Encoding": "gzip, deflate", "User-Agent": "gzip,  ConorSherman"}
-        response = requests.get('https://www.virustotal.com/vtapi/v2/file/report', params=params, headers=headers)
-        json_response = response.json()
+            #Update the Report
+            if json_response.get('positives') == None:
+                hash_report.update({json_response.get('resource'): "No Results"})
+            else:
+                hash_report.update({json_response.get('resource'): json_response.get('positives')})
 
-        #Update the Report
-        if json_response.get('positives') == None:
-            hash_report.update({json_response.get('resource'): "No Results"})
-        else:
-            hash_report.update({json_response.get('resource'): json_response.get('positives')})
+            # Time Delay for Rate Limit
+            print "Wait for it...checking input from row %s" %input_row + "\n"
+            # Terms and Conditions for VitusTotal
+            time.sleep(15)
+
     else:
-        print "Missing a HASH on row %s" %input_row
+        print "ERROR Missing a HASH on row %s" %input_row
 
     # Move to the next HASH
     input_row += 1
 
-    #Time Delay for Rate Limit
-    print "Wait for it...on row %s" %input_row + "\n"
-    time.sleep(15)
+
 
 
 # Prepare Export
