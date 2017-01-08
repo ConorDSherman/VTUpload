@@ -47,7 +47,7 @@ hash_report = {}
 # Temo Dictionary to hold the process name
 hash_process_name = {}
 
-for hash in range(1, 25): #Needs to Start at 1 due to the headers
+for hash in range(1, input_sheet.max_row): #Needs to Start at 1 due to the headers
     #Populating the HASH and process name
     hash_process_name.update({input_sheet.cell(row=input_row, column=2).value : input_sheet.cell(row=input_row, column=1).value})
 
@@ -108,3 +108,4 @@ for key, value in hash_report.items():
 
 # Close Excel to keep it clean
 output_workbook.close()
+
