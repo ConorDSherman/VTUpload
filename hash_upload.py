@@ -6,11 +6,11 @@ import xlsxwriter #Needed to write to Excel
 import csv #Needed to manipulate the raw data
 
 #Directores for Needed Files
-API_KEY_LOCATION = '/Users/conorsherman/Desktop/VT_API_KEY.txt'
-TANIUM_RAW_CSV = '/Users/conorsherman/Desktop/Tanium.csv'
-TANIUM_TEMP_XLSX = '/Users/conorsherman/Desktop/TEMP_Tanium_Process_Hash.xlsx'
-TANIUM_FINAL_XSLX = '/Users/conorsherman/Desktop/Tanium_Output.xlsx'
-HASH_CHECKED_FILE = '/Users/conorsherman/Desktop/Tanium_HASH_Checked.xlsx'
+API_KEY_LOCATION = '/Users/conorsherman/PycharmProjects/VTUpload/VT_API_KEY.txt'
+TANIUM_RAW_CSV = '/Users/conorsherman/PycharmProjects/VTUpload/input.csv'
+TANIUM_TEMP_XLSX = '/Users/conorsherman/PycharmProjects/VTUpload/TEMP_Tanium_Process_Hash.xlsx'
+TANIUM_FINAL_XSLX = '/Users/conorsherman/PycharmProjects/VTUpload/Tanium_Output.xlsx'
+HASH_CHECKED_FILE = '/Users/conorsherman/PycharmProjects/VTUpload/Tanium_HASH_Checked.xlsx'
 
 #Open Remotely Stored API Key
 API_FILE = open(API_KEY_LOCATION, 'r') #This is Unique to You
